@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atividade Interativa: Lideranças</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .question-card {
+            background-color: #e0f2f7;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #b3e0ff;
+        }
+        .question-card h3 {
+            color: #2a6592;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        .option-button {
+            background-color: #ffffff;
+            border: 1px solid #d1e7f0;
+            padding: 12px 18px;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            color: #4a5568;
+            font-weight: 500;
+        }
+        .option-button:hover {
+            background-color: #e6f7ff;
+            border-color: #a0d9f7;
+        }
+        .option-button.selected {
+            background-color: #cceeff;
+            border-color: #66ccff;
+        }
+        .option-button.correct {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+            font-weight: 600;
+        }
+        .option-button.incorrect {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+            font-weight: 600;
+        }
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #333;
+        }
+        .feedback.correct {
+            background-color: #e6ffed;
+            border: 1px solid #a8e6b3;
+            color: #0c6a2d;
+        }
+        .feedback.incorrect {
+            background-color: #ffe6e6;
+            border: 1px solid #e6a8a8;
+            color: #922b2b;
+        }
+        .saiba-mais {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f0f9ff;
+            border: 1px solid #cceeff;
+            border-radius: 10px;
+        }
+        .saiba-mais h4 {
+            color: #2a6592;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+        .nav-button {
+            background-color: #4a90e2;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .nav-button:hover {
+            background-color: #357bd8;
+            transform: translateY(-2px);
+        }
+        .nav-button:disabled {
+            background-color: #a0c4f0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .results-section {
+            text-align: center;
+            padding: 30px;
+            background-color: #f9f9f9;
+            border-radius: 12px;
+            border: 1px dashed #ccc;
+        }
+        .results-section h2 {
+            font-size: 2rem;
+            color: #2a6592;
+            margin-bottom: 15px;
+        }
+        .results-section p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .restart-button {
+            background-color: #28a745;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+        .restart-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Desvendando Lideranças: Religião e Sociedade</h1>
+        <p class="text-center mb-8 text-gray-600">Teste seus conhecimentos sobre as grandes lideranças e o papel das tradições religiosas na história e na sociedade.</p>
+
+        <div id="quiz-container"></div>
+
+        <div class="navigation-buttons">
+            <button id="prev-button" class="nav-button" disabled>Anterior</button>
+            <button id="next-button" class="nav-button">Próxima</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Qual o papel fundamental das religiões nas culturas e sociedades, de acordo com o texto?",
+                options: [
+                    "Apenas promover rituais e cerimônias.",
+                    "Defender os direitos dos mais pobres, promover justiça social e diálogo entre os povos.",
+                    "Focar exclusivamente na vida após a morte.",
+                    "Ditar regras estritas de vestimenta e alimentação."
+                ],
+                answer: "Defender os direitos dos mais pobres, promover justiça social e diálogo entre os povos.",
+                explanation: "O texto afirma que fazem parte dos princípios de muitas tradições religiosas a defesa dos direitos de todas as pessoas, em especial das mais pobres e excluídas, o esforço para que haja justiça social e diálogo entre os povos, assim como a afirmação da importância de cuidar do planeta e preservar todas as formas de vida."
+            },
+            {
+                question: "Quais são as três religiões denominadas proféticas, nascidas no Oriente Médio, mencionadas no texto?",
+                options: [
+                    "Budismo, Hinduísmo e Espiritismo.",
+                    "Judaísmo, Cristianismo e Islamismo.",
+                    "Confucionismo, Xintoísmo e Taoísmo.",
+                    "Candomblé, Umbanda e Xamanismo."
+                ],
+                answer: "Judaísmo, Cristianismo e Islamismo.",
+                explanation: "O texto explica que 'é nas três religiões nascidas no Oriente Médio – o Judaísmo, o Cristianismo e o Islamismo – que estão registradas sua presença e ação. Essas religiões são denominadas proféticas, pois têm em sua origem e trajetória a figura de um profeta.'"
+            },
+            {
+                question: "Quem foi Sidarta Gautama e o que significa 'Buda'?",
+                options: [
+                    "Um profeta do Cristianismo, que significa 'o ungido'.",
+                    "O fundador do Budismo, e 'Buda' significa 'desperto'.",
+                    "Um líder hindu, que significa 'o iluminado'.",
+                    "O último profeta do Islamismo, que significa 'o mensageiro'."
+                ],
+                answer: "O fundador do Budismo, e 'Buda' significa 'desperto'.",
+                explanation: "Sidarta Gautama é apresentado como o fundador do Budismo, que 'atingiu a iluminação espiritual. Passou, então, a chamar-se Buda, que significa \"desperto\"'."
+            },
+            {
+                question: "Qual era a crença fundamental de Confúcio, de acordo com o texto?",
+                options: [
+                    "A verdade só é conquistada pela meditação sobre o amor divino.",
+                    "O profeta é uma pessoa escolhida para transmitir a vontade divina.",
+                    "A religião acontecia por meio de um comportamento exemplar, resgatando valores perdidos nas relações sociais.",
+                    "A luta pela igualdade entre negros e brancos nos Estados Unidos."
+                ],
+                answer: "A religião acontecia por meio de um comportamento exemplar, resgatando valores perdidos nas relações sociais.",
+                explanation: "Para Confúcio, 'a religião acontecia por meio de um comportamento exemplar, ou seja, a doutrina se concretizava muito mais pelos gestos do que pelas palavras', e ele 'fundamentava sua crença nas relações sociais como um resgate de valores perdidos pelo ser humano'."
+            },
+            {
+                question: "Quem foi Maria Escolástica da Conceição Nazaré e por que ela se destacou?",
+                options: [
+                    "Uma missionária católica que defendia os camponeses na Amazônia.",
+                    "Uma ialorixá famosa do Brasil que enfrentou o preconceito e a discriminação.",
+                    "Uma líder da independência da Índia.",
+                    "Uma ativista que lutou contra a fome e a miséria no Brasil."
+                ],
+                answer: "Uma ialorixá famosa do Brasil que enfrentou o preconceito e a discriminação.",
+                explanation: "Maria Escolástica da Conceição Nazaré, conhecida como Mãe Menininha do Gantois, 'foi a ialorixá mais famosa do Brasil e uma líder carismática que enfrentou o preconceito e a discriminação de forma corajosa'."
+            },
+            {
+                question: "Qual o princípio defendido por Martin Luther King Jr. em sua luta pelos direitos civis dos negros nos Estados Unidos?",
+                options: [
+                    "A violência e a retaliação.",
+                    "A não violência e o amor ao próximo.",
+                    "A segregação racial.",
+                    "A luta armada."
+                ],
+                answer: "A não violência e o amor ao próximo.",
+                explanation: "O texto afirma que suas 'atitudes e seus discursos para a conquista dos direitos civis dos negros baseavam-se no princípio da não violência e do amor ao próximo'."
+            },
+            {
+                question: "Quem foi Herbert de Souza, conhecido como Betinho, e qual sua principal contribuição?",
+                options: [
+                    "Um padre marista fundador do Instituto dos Irmãos Maristas.",
+                    "Um símbolo da luta contra a fome e a miséria no Brasil, fundador da ONG Ação da Cidadania.",
+                    "A primeira africana a receber o Prêmio Nobel da Paz.",
+                    "Uma missionária católica defensora da Floresta Amazônica."
+                ],
+                answer: "Um símbolo da luta contra a fome e a miséria no Brasil, fundador da ONG Ação da Cidadania.",
+                explanation: "Herbert de Souza (Betinho) 'foi um símbolo da luta contra a fome e a miséria e a favor da cidadania no Brasil, nas décadas de 1980 e 1990. Fundou a ONG Ação da Cidadania contra a Fome, a Miséria e pela Vida'."
+            },
+            {
+                question: "Qual foi a principal área de atuação de Dorothy Stang no Brasil?",
+                options: [
+                    "A educação de crianças e jovens em vulnerabilidade social.",
+                    "A defesa dos direitos dos trabalhadores em sindicatos.",
+                    "A defesa dos direitos dos camponeses e a proteção da Floresta Amazônica.",
+                    "A luta pela igualdade entre negros e brancos nos Estados Unidos."
+                ],
+                answer: "A defesa dos direitos dos camponeses e a proteção da Floresta Amazônica.",
+                explanation: "Dorothy Stang 'ficou conhecida por defender os direitos dos camponeses e proteger a Floresta Amazônica' e foi responsável por 'implementar projetos de desenvolvimento sustentável'."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(questions.length).fill(null); // Para armazenar as respostas do usuário
+        let score = 0;
+
+        const quizContainer = document.getElementById('quiz-container');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+
+        function renderQuestion(index) {
+            quizContainer.innerHTML = ''; // Limpa o conteúdo anterior
+
+            if (index >= questions.length) {
+                showResults();
+                return;
+            }
+
+            const questionData = questions[index];
+            const questionCard = document.createElement('div');
+            questionCard.className = 'question-card';
+
+            const questionTitle = document.createElement('h3');
+            questionTitle.textContent = `Questão ${index + 1}: ${questionData.question}`;
+            questionCard.appendChild(questionTitle);
+
+            const optionsGrid = document.createElement('div');
+            optionsGrid.className = 'options-grid';
+
+            questionData.options.forEach((option, i) => {
+                const button = document.createElement('button');
+                button.className = 'option-button';
+                button.textContent = option;
+                button.dataset.index = i; // Armazena o índice da opção
+                button.onclick = () => selectOption(index, option, button);
+                optionsGrid.appendChild(button);
+
+                // Se o usuário já respondeu, marca a opção selecionada
+                if (userAnswers[index] === option) {
+                    button.classList.add('selected');
+                }
+            });
+
+            questionCard.appendChild(optionsGrid);
+            quizContainer.appendChild(questionCard);
+
+            // Adiciona feedback e "Saiba Mais" se a questão já foi respondida
+            if (userAnswers[index] !== null) {
+                displayFeedback(index);
+            }
+
+            updateNavigationButtons();
+        }
+
+        function selectOption(questionIndex, selectedOption, clickedButton) {
+            // Remove a classe 'selected' de todos os botões para desmarcar
+            const buttons = clickedButton.parentNode.querySelectorAll('.option-button');
+            buttons.forEach(btn => btn.classList.remove('selected', 'correct', 'incorrect'));
+
+            // Adiciona a classe 'selected' ao botão clicado
+            clickedButton.classList.add('selected');
+
+            userAnswers[questionIndex] = selectedOption;
+            displayFeedback(questionIndex);
+            updateNavigationButtons();
+        }
+
+        function displayFeedback(questionIndex) {
+            let feedbackElement = quizContainer.querySelector('.feedback');
+            if (feedbackElement) {
+                feedbackElement.remove(); // Remove feedback anterior se existir
+            }
+
+            let saibaMaisElement = quizContainer.querySelector('.saiba-mais');
+            if (saibaMaisElement) {
+                saibaMaisElement.remove(); // Remove Saiba Mais anterior se existir
+            }
+
+            const questionData = questions[questionIndex];
+            const userAnswer = userAnswers[questionIndex];
+
+            feedbackElement = document.createElement('div');
+            feedbackElement.className = 'feedback';
+
+            const buttons = quizContainer.querySelectorAll('.option-button');
+            buttons.forEach(button => {
+                if (button.textContent === questionData.answer) {
+                    button.classList.add('correct');
+                }
+                if (button.textContent === userAnswer && userAnswer !== questionData.answer) {
+                    button.classList.add('incorrect');
+                }
+                // Desativa os botões após a seleção
+                button.disabled = true;
+            });
+
+            if (userAnswer === questionData.answer) {
+                feedbackElement.classList.add('correct');
+                feedbackElement.innerHTML = `<strong>Parabéns!</strong> Sua resposta está correta.`;
+            } else {
+                feedbackElement.classList.add('incorrect');
+                feedbackElement.innerHTML = `<strong>Ops!</strong> Sua resposta está incorreta. A resposta correta era: "${questionData.answer}".`;
+            }
+
+            const saibaMais = document.createElement('div');
+            saibaMais.className = 'saiba-mais';
+            saibaMais.innerHTML = `
+                <h4>Saiba Mais:</h4>
+                <p>${questionData.explanation}</p>
+            `;
+            
+            quizContainer.querySelector('.question-card').appendChild(feedbackElement);
+            quizContainer.querySelector('.question-card').appendChild(saibaMais);
+        }
+
+
+        function updateNavigationButtons() {
+            prevButton.disabled = currentQuestionIndex === 0;
+            nextButton.textContent = currentQuestionIndex === questions.length - 1 ? 'Finalizar' : 'Próxima';
+        }
+
+        function calculateScore() {
+            score = 0;
+            questions.forEach((q, index) => {
+                if (userAnswers[index] === q.answer) {
+                    score++;
+                }
+            });
+        }
+
+        function showResults() {
+            calculateScore();
+            quizContainer.innerHTML = `
+                <div class="results-section">
+                    <h2>Quiz Finalizado!</h2>
+                    <p>Você acertou ${score} de ${questions.length} questões.</p>
+                    <button id="restart-button" class="restart-button">Tentar Novamente</button>
+                </div>
+            `;
+            prevButton.style.display = 'none';
+            nextButton.style.display = 'none';
+
+            document.getElementById('restart-button').onclick = restartQuiz;
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            userAnswers.fill(null);
+            score = 0;
+            prevButton.style.display = 'inline-block';
+            nextButton.style.display = 'inline-block';
+            renderQuestion(currentQuestionIndex);
+        }
+
+        prevButton.onclick = () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion(currentQuestionIndex);
+            }
+        };
+
+        nextButton.onclick = () => {
+            if (currentQuestionIndex < questions.length) {
+                currentQuestionIndex++;
+                renderQuestion(currentQuestionIndex);
+            }
+        };
+
+        // Inicia o quiz
+        window.onload = () => {
+            renderQuestion(currentQuestionIndex);
+        };
+    </script>
+</body>
+</html>
